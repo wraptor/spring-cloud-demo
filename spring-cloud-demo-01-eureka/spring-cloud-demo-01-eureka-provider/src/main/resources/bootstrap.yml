@@ -1,0 +1,15 @@
+#服务提供方
+spring:
+  application:
+    name: provider
+
+server:
+  port: 8000
+
+eureka:
+  instance:
+    hostname: localhost #eureka服务端的实例名称
+  client:
+    service-url:
+      # 与注册中心交互的url
+      defaultZone: http://${eureka.instance.hostname}:8761/eureka/

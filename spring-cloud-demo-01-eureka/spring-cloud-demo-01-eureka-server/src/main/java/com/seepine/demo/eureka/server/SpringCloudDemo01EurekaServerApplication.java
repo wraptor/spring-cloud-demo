@@ -6,12 +6,12 @@ import org.springframework.cloud.client.SpringCloudApplication;
 import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
 
 /**
- * @author huanghs(xm_hhs @ 163.com)
+ * @author seepine
  * @date 2020/1/25 23:52
- * @since 1.1.0
+ * @since 1.0.0
  */
-@SpringBootApplication
 @EnableEurekaServer
+@SpringBootApplication
 public class SpringCloudDemo01EurekaServerApplication {
 
     public static void main(String[] args) {

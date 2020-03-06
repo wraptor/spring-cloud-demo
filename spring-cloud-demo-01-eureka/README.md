@@ -6,7 +6,7 @@
 
 spring-cloud-demo-01-eureka模块分为三个子模块，分别为Eureka-Server(Eureka服务端)、Eureka-Provider(供应者)和Eureka-Consumer(消费者)。
 
-## Eureka服务注册与发现
+## 一、Eureka服务注册与发现
 ### 1.Eureka-Server
 1.1 添加依赖
 ```xml
@@ -85,3 +85,14 @@ eureka:
 ## 结果检验
 
 打开http://localhost:8761/，将会看到Eureka的界面，在其中
+
+## 一、Eureka服务注册与发现
+### 1.Eureka-Server
+1.1 添加依赖
+```xml
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+    </dependency>
+</dependencies>

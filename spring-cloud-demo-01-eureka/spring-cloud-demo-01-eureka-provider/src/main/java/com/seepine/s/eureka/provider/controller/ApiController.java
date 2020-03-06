@@ -13,11 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class ApiController {
-
     @RequestMapping("/hello/{name}")
     public String hello(@PathVariable String name) {
         System.out.println("I am provider , name :" + name);
         return "hello " + name;
     }
-
 }

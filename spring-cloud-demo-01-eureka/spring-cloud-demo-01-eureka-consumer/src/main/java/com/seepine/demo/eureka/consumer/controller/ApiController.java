@@ -1,6 +1,6 @@
 package com.seepine.demo.eureka.consumer.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
@@ -19,19 +19,12 @@ import java.util.List;
  * @since 1.1.0
  */
 @RestController
+@AllArgsConstructor
 public class ApiController {
-
-    @Autowired
     private DiscoveryClient discoveryClient;
-
-    @Autowired
     private RestTemplate restTemplate;
 
 
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
 
     @RequestMapping("/hello/{name}")
     public String hello(@PathVariable String name) {

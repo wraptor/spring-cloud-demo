@@ -24,8 +24,6 @@ public class ApiController {
     private DiscoveryClient discoveryClient;
     private RestTemplate restTemplate;
 
-
-
     @RequestMapping("/hello/{name}")
     public String hello(@PathVariable String name) {
         System.out.println("I am consumer , name :" + name);

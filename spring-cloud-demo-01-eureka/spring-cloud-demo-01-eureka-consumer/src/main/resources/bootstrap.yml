@@ -1,15 +1,11 @@
-#服务提供方
 spring:
   application:
     name: consumer
-
 server:
   port: 9000
-
 eureka:
   instance:
     hostname: localhost #eureka服务端的实例名称
   client:
     service-url:
-      # 与注册中心交互的url
-      defaultZone: http://${eureka.instance.hostname}:8761/eureka/
+      defaultZone: http://${eureka.instance.hostname}:8761/eureka/  # 与注册中心交互的url

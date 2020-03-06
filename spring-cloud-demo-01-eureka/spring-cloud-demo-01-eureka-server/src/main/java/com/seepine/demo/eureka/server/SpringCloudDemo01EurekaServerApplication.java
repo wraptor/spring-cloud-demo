@@ -17,5 +17,4 @@ public class SpringCloudDemo01EurekaServerApplication {
     public static void main(String[] args) {
         SpringApplication.run(SpringCloudDemo01EurekaServerApplication.class, args);
     }
-
 }

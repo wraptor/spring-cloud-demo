@@ -1,13 +1,10 @@
 server:
   port: 8761
-
 eureka:
   instance:
     hostname: localhost
-
   client:
-    registerWithEureka: false #该实例是否向 Eureka  Server注册自己
-    fetchRegistry: false  #该实例是否向 Eureka 服务器获取所有的注册信息表
+    register-with-eureka: false #该实例是否向EurekaServer注册自己，默认true
+    fetch-registry: false  #该实例是否向Eureka服务器获取所有的注册信息表，默认true
     serviceUrl:
       defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/  #配置 Eureka-Server 地址
-    registry-fetch-interval-seconds: 30 #从 Eureka-Server 拉取注册服务实例信息频率，默认：30 秒

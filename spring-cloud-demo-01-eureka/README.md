@@ -102,7 +102,7 @@ eureka:
 
 打开[http://localhost:8761/](http://localhost:8761/)，将会看到Eureka的界面以及Eureka-Provider和Eureka-Consumer服务
 
-## 二、生产者与消费者
+## 二、生产者与消费者(RestTemplate)
 
 ### 1.Eureka-Provider
 
@@ -155,4 +155,73 @@ public class ApiController {
 
 ```
 I am provider , name :seepine
+```
+
+
+
+## 三、生产者与消费者(Feign)
+
+### 1.Eureka-Consumer
+
+1.1 添加Feign依赖
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-openfeign</artifactId>
+</dependency>
+```
+
+1.2 启动类添加注解(@EnableFeignClients)
+```java
+@EnableEurekaClient
+@SpringBootApplication
+@EnableFeignClients
+public class SpringCloudDemo01EurekaConsumerApplication {
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+
+    public static void main(String[] args) {
+        SpringApplication.run(SpringCloudDemo01EurekaConsumerApplication.class, args);
+    }
+
+}
+```
+
+1.3 添加FeignService
+```java
+package com.seepine.demo.eureka.consumer.feign;
+
+//填写要调用方，即生产者spring.application.name
+@FeignClient("provider")
+public interface RemoteApiService {
+    @GetMapping("/hello/{name}")
+    String sayHello(@PathVariable("name") String name);
+}
+```
+
+1.4 添加接口
+
+```java
+@RestController
+@AllArgsConstructor
+public class ApiController {
+    private RemoteApiService remoteApiService;
+
+    @RequestMapping("/helloByFeign/{name}")
+    public String helloByFeign(@PathVariable String name) {
+        return remoteApiService.sayHello(name);
+    }
+}
+```
+
+1.5 测试接口
+
+![](https://pic.downk.cc/item/5e6368d298271cb2b8d26e96.png)
+
+同时Eureka-Provider控制台打印出，说明能够通过Eureka-consumer的接口，调用Eureka-Provider的接口
+
+```
+I am provider , name :seepine-feign
 ```

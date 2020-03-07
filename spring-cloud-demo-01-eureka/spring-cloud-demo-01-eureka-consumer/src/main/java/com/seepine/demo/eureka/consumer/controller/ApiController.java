@@ -1,9 +1,9 @@
 package com.seepine.demo.eureka.consumer.controller;
 
+import com.seepine.demo.eureka.consumer.feign.RemoteApiService;
 import lombok.AllArgsConstructor;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +23,7 @@ import java.util.List;
 public class ApiController {
     private DiscoveryClient discoveryClient;
     private RestTemplate restTemplate;
+    private RemoteApiService remoteApiService;
 
     @RequestMapping("/hello/{name}")
     public String hello(@PathVariable String name) {
@@ -33,5 +34,10 @@ public class ApiController {
             return restTemplate.getForObject(serviceInstance.getUri().toString() + "/hello/" + name, String.class);
         }
         return "not find provider";
+    }
+
+    @RequestMapping("/helloByFeign/{name}")
+    public String helloByFeign(@PathVariable String name) {
+        return remoteApiService.sayHello(name);
     }
 }

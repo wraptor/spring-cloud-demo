@@ -100,7 +100,7 @@ eureka:
 
 ## 结果检验
 
-打开http://localhost:8761/，将会看到Eureka的界面，在其中
+打开[http://localhost:8761/](http://localhost:8761/)，将会看到Eureka的界面以及Eureka-Provider和Eureka-Consumer服务
 
 ## 二、生产者与消费者
 
@@ -120,6 +120,7 @@ public class ApiController {
 ```
 
 1.2 测试接口
+
 ![](https://pic.downk.cc/item/5e61c52598271cb2b8045f07.png)
 
 ### 2.Eureka-Consumer
@@ -147,6 +148,7 @@ public class ApiController {
 ```
 
 1.2 测试接口
+
 ![](https://pic.downk.cc/item/5e61ffc398271cb2b8167015.png)
 
 同时Eureka-Provider控制台打印出，说明能够通过Eureka-consumer的接口，调用Eureka-Provider的接口

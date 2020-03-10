@@ -19,11 +19,6 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
         </dependency>
-        <!-- undertow -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-undertow</artifactId>
-        </dependency>
         <!--加入服务认证(密码),需要引入security-->
         <dependency>
             <groupId>org.springframework.boot</groupId>

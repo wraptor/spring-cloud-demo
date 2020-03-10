@@ -65,19 +65,7 @@ eureka:
 </dependencies>
 ```
 
-1.2 在启动类上添加注解@EnableEurekaServer
-
-```java
-@EnableEurekaServer
-@SpringBootApplication
-public class SpringCloudDemo01EurekaServerApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(SpringCloudDemo01EurekaServerApplication.class, args);
-    }
-}
-```
-
-1.3 添加配置文件
+1.2 添加配置文件
 
 ```yaml
 server:

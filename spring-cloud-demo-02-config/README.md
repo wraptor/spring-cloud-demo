@@ -51,6 +51,7 @@ server:
 1.4 创建git配置文件仓库（可参考https://github.com/seepine/spring-cloud-demo-config）
 
 创建文件名为config-client-dev.yml
+
 ```yaml
 user:
   username: seepine
@@ -75,6 +76,7 @@ user:
 ```
 
 2.2 添加配置文件
+
 ```yaml
 spring:
   application:
@@ -89,6 +91,7 @@ server:
 ```
 
 2.3 创建两个获取配置文件值的实体类
+
 ```java
 @Data
 @Component
@@ -110,6 +113,7 @@ public class UserConfig {
 ```
 
 2.4 编写测试接口
+
 ```java
 @RestController
 @AllArgsConstructor
@@ -129,6 +133,7 @@ public class ApiController {
 ```
 
 2.5 分别测试两个接口
+
 ![](https://pic.downk.cc/item/5e670cb798271cb2b87e351c.png)
 ![](https://pic.downk.cc/item/5e670cc298271cb2b87e3f38.png)
 

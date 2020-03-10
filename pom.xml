@@ -11,6 +11,7 @@
     <modules>
         <module>spring-cloud-demo-01-eureka</module>
         <module>spring-cloud-demo-02-config</module>
+        <module>spring-cloud-demo-03-nacos</module>
     </modules>
 
     <developers>
@@ -30,6 +31,7 @@
         <java.version>1.8</java.version>
         <spring-boot.version>2.2.5.RELEASE</spring-boot.version>
         <spring-cloud.version>Hoxton.SR3</spring-cloud.version>
+        <spring-cloud-alibaba.version>2.2.0.RELEASE</spring-cloud-alibaba.version>
     </properties>
 
     <dependencies>
@@ -74,6 +76,14 @@
                         <groupId>org.springframework.boot</groupId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <!--spring cloud alibaba web-->
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${spring-cloud-alibaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: config-client
+  cloud:
+    config:
+#      uri: http://localhost:10000
+      discovery:
+        enabled: true  #默认false，设为true表示使用注册中心中的configserver配置，而不是配置的uri
+        service-id: CONFIG-SERVER  #指定config server在服务发现中的serviceId，默认为：configserver
+  profiles:
+    active: dev
+server:
+  port: 11000
+eureka:
+  instance:
+    hostname: localhost #eureka服务端的实例名称
+  client:
+    service-url:
+      defaultZone: http://seepine:123456@${eureka.instance.hostname}:8761/eureka/  # 与注册中心交互的url

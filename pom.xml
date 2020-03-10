@@ -10,6 +10,7 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>spring-cloud-demo-01-eureka</module>
+        <module>spring-cloud-demo-02-config</module>
     </modules>
 
     <developers>
@@ -77,6 +78,24 @@
         </dependencies>
     </dependencyManagement>
 
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${spring-boot.version}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>repackage</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
     <repositories>
         <!-- aliyun maven -->

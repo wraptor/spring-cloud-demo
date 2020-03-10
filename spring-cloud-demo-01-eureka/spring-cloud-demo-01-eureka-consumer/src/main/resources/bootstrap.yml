@@ -8,4 +8,4 @@ eureka:
     hostname: localhost #eureka服务端的实例名称
   client:
     service-url:
-      defaultZone: http://${eureka.instance.hostname}:8761/eureka/  # 与注册中心交互的url
+      defaultZone: http://seepine:123456@${eureka.instance.hostname}:8761/eureka/  # 与注册中心交互的url

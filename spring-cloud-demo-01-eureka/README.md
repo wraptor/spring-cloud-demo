@@ -213,3 +213,30 @@ public class ApiController {
 ```
 I am provider , name :seepine-feign
 ```
+
+## 四、Eureka-Server增加用户验证
+
+### 1.添加依赖
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+```
+
+### 2.添加配置
+```yaml
+spring:
+  security:
+    user:
+      name: seepine
+      password: 123456
+```
+
+### 3.打开[http://127.0.0.1:8761/](http://127.0.0.1:8761/)验证
+
+![](https://pic.downk.cc/item/5e6706a098271cb2b87b83f9.png)
+
+### 4.修改所有Eureka连接url
+
+http://seepine:123456@${eureka.instance.hostname}:${server.port}/eureka/

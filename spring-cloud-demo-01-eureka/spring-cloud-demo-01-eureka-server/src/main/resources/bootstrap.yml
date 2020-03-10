@@ -1,3 +1,10 @@
+spring:
+  application:
+    name: eureka-server
+  security:
+    user:
+      name: seepine
+      password: 123456
 server:
   port: 8761
 eureka:
@@ -7,4 +14,5 @@ eureka:
     register-with-eureka: false #该实例是否向EurekaServer注册自己，默认true
     fetch-registry: false  #该实例是否向Eureka服务器获取所有的注册信息表，默认true
     serviceUrl:
-      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/  #配置 Eureka-Server 地址
+      defaultZone: http://seepine:123456@${eureka.instance.hostname}:${server.port}/eureka/  #配置 Eureka-Server 地址
+

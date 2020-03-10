@@ -1,4 +1,4 @@
-package com.seepine.s.eureka.provider.controller;
+package com.seepine.demo.eureka.provider.controller;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

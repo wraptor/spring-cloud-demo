@@ -14,7 +14,6 @@ import org.springframework.web.client.RestTemplate;
  * @date 2020/1/29 00:08
  * @since 1.1.0
  */
-@EnableEurekaClient
 @SpringBootApplication
 @EnableFeignClients
 public class SpringCloudDemo01EurekaConsumerApplication {

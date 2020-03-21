@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 /**
  * UserConfig
  *
- * @author huanghs(xm_hhs @ 163.com)
+ * @author seepine(seepine @ 163.com)
  * @date 2020/3/10 10:22
  * @since 1.0.0
  */

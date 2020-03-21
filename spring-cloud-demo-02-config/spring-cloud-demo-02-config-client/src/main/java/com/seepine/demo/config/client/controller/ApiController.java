@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * ApiController
  *
- * @author huanghs(xm_hhs @ 163.com)
+ * @author seepine(seepine @ 163.com)
  * @date 2020/3/9 18:57
  * @since 1.0.0
  */

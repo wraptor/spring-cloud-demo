@@ -1,19 +1,12 @@
 spring:
   application:
-    name: config-server
+    name: nacos-provider
   cloud:
-    config:
-      server:
-        git:
-          uri: https://github.com/seepine/spring-cloud-demo-config #配置文件所在仓库
-#          username: github 登录账号
-#          password: github 登录密码
-#          default-label: master #配置文件分支
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+      config:
+        server-addr: ${spring.cloud.nacos.discovery.server-addr}
+        file-extension: yml
 server:
-  port: 10000
-eureka:
-  instance:
-    hostname: localhost #eureka服务端的实例名称
-  client:
-    service-url:
-      defaultZone: http://seepine:123456@${eureka.instance.hostname}:8761/eureka/  # 与注册中心交互的url
+  port: 12000

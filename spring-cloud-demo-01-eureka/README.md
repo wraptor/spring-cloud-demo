@@ -238,5 +238,6 @@ spring:
 ![](https://pic.downk.cc/item/5e6706a098271cb2b87b83f9.png)
 
 ### 4.修改所有Eureka连接url
-
+```
 http://seepine:123456@${eureka.instance.hostname}:${server.port}/eureka/
+```

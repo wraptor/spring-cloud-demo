@@ -12,6 +12,7 @@
         <module>spring-cloud-demo-01-eureka</module>
         <module>spring-cloud-demo-02-config</module>
         <module>spring-cloud-demo-03-nacos</module>
+        <module>spring-cloud-demo-04-gateway</module>
     </modules>
 
     <developers>

@@ -85,11 +85,11 @@ public class ResponseGlobalFilter implements GlobalFilter, Ordered {
                         dataBuffer.read(content);
                         DataBufferUtils.release(dataBuffer);
                         String rs = new String(content, StandardCharsets.UTF_8);
-                        Response<String> response = new Response<>();
-                        response.setCode(Objects.requireNonNull(originalResponse.getStatusCode()).value());
-                        response.setMsg(originalResponse.getStatusCode().name());
+                        Response<String> response;
                         if (originalResponse.getStatusCode() == HttpStatus.OK) {
-                            response.setData(rs);
+                            response = Response.build(originalResponse.getStatusCode(), rs);
+                        } else {
+                            response = Response.build(Objects.requireNonNull(originalResponse.getStatusCode()));
                         }
                         byte[] newRs = JSON.toJSONString(response).getBytes(StandardCharsets.UTF_8);
                         originalResponse.getHeaders().setContentLength(newRs.length);
@@ -99,7 +99,6 @@ public class ResponseGlobalFilter implements GlobalFilter, Ordered {
                 return super.writeWith(body);
             }
         };
-        // replace response with decorator
         return chain.filter(exchange.mutate().response(decoratedResponse).build());
     }
     @Override
@@ -119,3 +118,70 @@ public class ResponseGlobalFilter implements GlobalFilter, Ordered {
 
 ![](https://pic.downk.cc/item/5e7f228f504f4bcb0462bc98.png)
 
+## 三、服务熔断
+
+### 1.添加依赖
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+</dependency>
+```
+### 2.使用routes配置服务
+
+在配置文件中的gateway节点下增加nacos-provider的routes配置（当然也可以使用Bean的方式配置）
+```yaml
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: nacos-provider  #可随意指定但是要保证唯一
+          uri: lb://nacos-provider  #lib://指定服务名,也可直接指定地址(http://127.0.0.1:12000)
+          predicates:
+            - Path=/provider/** #当网关匹配到改路径，将会转发到uri地址
+          filters:
+            - StripPrefix=1
+            - name: Hystrix
+              args:
+                name: fallbackcmd
+                fallbackUri: forward:/fallback
+```
+关于"StripPrefix=1"配置，是网关自带的过滤器，去掉N个前缀，具体实现参考StripPrefixGatewayFilterFactory,
+因为provider的接口路径为
+```
+http://localhost:12000/user/config
+```
+而从网关访问接口的路径是
+```
+http://localhost:13000/provider/user/config
+```
+由于我们配置了路由，网关会转发到对应的ip:port，也就是
+```
+http://localhost:12000/provider/user/config
+```
+此时会发现，与我们provider访问的接口路径多了一层/provider,此时若未配置StripPrefix=1将会出现404操作，
+所以有如下三种方式可解决此问题
+1.配置上StripPrefix=1；
+2.在provider加上访问项目名称server.servlet.context-path=/provider；
+3.编写request过滤器，过滤每个链接的第一个路径
+
+### 3.编写熔断接口
+```java
+@RestController
+public class FallbackController {
+    @GetMapping("/fallback")
+    public Response<String> fallback() {
+        return Response.build(HttpStatus.SERVICE_UNAVAILABLE);
+    }
+}
+```
+
+### 4.测试熔断效果
+
+停止provider服务后
+
+![](https://pic.downk.cc/item/5e7f2932504f4bcb0467f073.png)
+
+启动provider服务后
+
+![](https://pic.downk.cc/item/5e7f294a504f4bcb04680340.png)

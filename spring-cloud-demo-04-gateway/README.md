@@ -1,6 +1,6 @@
 # spring-cloud-demo-03-nacos
 
-> 本Demo演示了网关的搭建，以及如何使用网关配合Nacos访问其他服务，并进行分流、限流和熔断等配置。
+> 本Demo演示了网关的搭建，以及如何使用网关配合Nacos（使用eureka和config同理）访问其他服务，并进行分流、限流和熔断等配置。
 
 ## 模块介绍
 
@@ -64,4 +64,58 @@ server:
 [http://localhost:13000/nacos-provider/user/config](http://localhost:13000/nacos-provider/user/config)
 ![](https://pic.downk.cc/item/5e7f0fe1504f4bcb0452e6fe.png)
 
+## 二、过滤器
+
+### 1.建立response全局过滤器来进行统一返回
+实现GlobalFilter, Ordered
+```java
+@Component
+public class ResponseGlobalFilter implements GlobalFilter, Ordered {
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        ServerHttpResponse originalResponse = exchange.getResponse();
+        DataBufferFactory bufferFactory = originalResponse.bufferFactory();
+        ServerHttpResponseDecorator decoratedResponse = new ServerHttpResponseDecorator(originalResponse) {
+            @Override
+            public Mono<Void> writeWith(Publisher<? extends DataBuffer> body) {
+                if (body instanceof Flux) {
+                    Flux<? extends DataBuffer> fluxBody = (Flux<? extends DataBuffer>) body;
+                    return super.writeWith(fluxBody.map(dataBuffer -> {
+                        byte[] content = new byte[dataBuffer.readableByteCount()];
+                        dataBuffer.read(content);
+                        DataBufferUtils.release(dataBuffer);
+                        String rs = new String(content, StandardCharsets.UTF_8);
+                        Response<String> response = new Response<>();
+                        response.setCode(Objects.requireNonNull(originalResponse.getStatusCode()).value());
+                        response.setMsg(originalResponse.getStatusCode().name());
+                        if (originalResponse.getStatusCode() == HttpStatus.OK) {
+                            response.setData(rs);
+                        }
+                        byte[] newRs = JSON.toJSONString(response).getBytes(StandardCharsets.UTF_8);
+                        originalResponse.getHeaders().setContentLength(newRs.length);
+                        return bufferFactory.wrap(newRs);
+                    }));
+                }
+                return super.writeWith(body);
+            }
+        };
+        // replace response with decorator
+        return chain.filter(exchange.mutate().response(decoratedResponse).build());
+    }
+    @Override
+    public int getOrder() {
+        return -2;
+    }
+}
+```
+
+### 2.分别测试正确及错误的接口
+
+[http://localhost:13000/nacos-provider/user/config](http://localhost:13000/nacos-provider/user/config)
+
+![](https://pic.downk.cc/item/5e7f2274504f4bcb0462a6d4.png)
+
+[http://localhost:13000/nacos-provider/user/config/123](http://localhost:13000/nacos-provider/user/config/123)
+
+![](https://pic.downk.cc/item/5e7f228f504f4bcb0462bc98.png)
 

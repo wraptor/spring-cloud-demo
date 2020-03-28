@@ -11,9 +11,11 @@ spring:
         file-extension: yml
     #配置gateway
     gateway:
+      #对应README步骤一
       discovery:
         locator:
-          enabled: true   #开启通过应用名访问其他服务
-          lower-case-service-id: true   #转化为小写
+          enabled: true   #开启通过注册中心服务名访问其他服务
+          lower-case-service-id: true   #转化为小写,当使用euraka时，服务注册名都为大写
+
 server:
   port: 13000

@@ -60,7 +60,7 @@ server:
 ![](https://pic.downk.cc/item/5e7f0fbe504f4bcb0452c173.png)
 
 ### 5.通过网关访问provider
-
+其中"nacos-provider"为被访问服务的spring application name，也是向nacos注册的服务名
 [http://localhost:13000/nacos-provider/user/config](http://localhost:13000/nacos-provider/user/config)
 ![](https://pic.downk.cc/item/5e7f0fe1504f4bcb0452e6fe.png)
 

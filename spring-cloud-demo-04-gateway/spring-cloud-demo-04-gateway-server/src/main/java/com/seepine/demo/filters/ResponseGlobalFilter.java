@@ -1,12 +1,11 @@
 package com.seepine.demo.filters;
 
 import com.alibaba.fastjson.JSON;
-import lombok.Data;
+import com.seepine.demo.utils.Response;
 import org.reactivestreams.Publisher;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.core.io.buffer.DataBufferUtils;
@@ -18,7 +17,6 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
@@ -44,12 +42,11 @@ public class ResponseGlobalFilter implements GlobalFilter, Ordered {
                         // 释放掉内存
                         DataBufferUtils.release(dataBuffer);
                         String rs = new String(content, StandardCharsets.UTF_8);
-
-                        Response<String> response = new Response<>();
-                        response.setCode(Objects.requireNonNull(originalResponse.getStatusCode()).value());
-                        response.setMsg(originalResponse.getStatusCode().name());
+                        Response<String> response;
                         if (originalResponse.getStatusCode() == HttpStatus.OK) {
-                            response.setData(rs);
+                            response = Response.build(originalResponse.getStatusCode(), rs);
+                        } else {
+                            response = Response.build(Objects.requireNonNull(originalResponse.getStatusCode()));
                         }
                         byte[] newRs = JSON.toJSONString(response).getBytes(StandardCharsets.UTF_8);
                         originalResponse.getHeaders().setContentLength(newRs.length);
@@ -72,12 +69,5 @@ public class ResponseGlobalFilter implements GlobalFilter, Ordered {
     @Override
     public int getOrder() {
         return -2;
-    }
-
-    @Data
-    static class Response<T> implements Serializable {
-        private int code;
-        private String msg;
-        private T data;
     }
 }

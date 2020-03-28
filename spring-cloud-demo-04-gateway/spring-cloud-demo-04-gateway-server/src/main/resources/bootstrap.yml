@@ -2,16 +2,18 @@ spring:
   application:
     name: gateway-server
   cloud:
+    #配置nacos
     nacos:
       discovery:
-        server-addr: 127.0.0.1:8840
+        server-addr: 127.0.0.1:8848
       config:
         server-addr: ${spring.cloud.nacos.discovery.server-addr}
         file-extension: yml
+    #配置gateway
     gateway:
       discovery:
         locator:
-          enabled: true
-          lower-case-service-id: true
+          enabled: true   #开启通过应用名访问其他服务
+          lower-case-service-id: true   #转化为小写
 server:
   port: 13000

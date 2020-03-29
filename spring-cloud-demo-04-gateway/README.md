@@ -246,6 +246,8 @@ public class FallbackController {
 }
 ```
 
+ps:
+也可以使用handle的方法，开启configs.
 ### 4.测试熔断效果
 
 默认超时时间为一秒钟，分别输入不同参数可得结果与结论一致
@@ -278,3 +280,60 @@ hystrix:
 
 ![](https://pic.downk.cc/item/5e809e0d504f4bcb04648ddf.png)
 
+### 7.hystrix-dashboard
+添加依赖
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-hystrix-dashboard</artifactId>
+</dependency>
+```
+访问/hystrix
+
+## 四、限流
+Spring Cloud Gateway集成了Redis限流，可以根据不同服务做不同的限流规则，如iP限流、用户限流 和接口限流，本例演示的是全局Ip限流
+
+### 1.添加Redis依赖
+```xml
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-data-redis-reactive</artifactId>
+</dependency>
+```
+
+### 2.添加相关配置
+```yaml
+spring:
+  redis:
+    host: localhost
+  cloud:
+    gateway:
+      #配置全局过滤器
+      default-filters:
+        - name: RequestRateLimiter
+          args:
+            key-resolver: '#{@remoteAddrKeyResolver}'   # 使用SpEL名称引用Bean，与建立的RateLimiterConfig类中的bean的name相同
+            redis-rate-limiter.replenishRate: 20    # 每秒最大访问次数
+            redis-rate-limiter.burstCapacity: 20    # 令牌桶最大容量
+```
+
+### 3.新建限流配置类，指定限流key
+```java
+@Configuration
+public class RateLimiterConfig {
+    @Bean
+    public KeyResolver remoteAddrKeyResolver() {
+        return exchange -> Mono.just(Objects.requireNonNull(exchange.getRequest().getRemoteAddress()).getAddress().getHostAddress());
+    }
+}
+```
+
+### 4.通过jmeter测试效果
+
+未配置限流
+
+![](https://pic.downk.cc/item/5e80c48a504f4bcb0482cb65.png)
+
+配置限流
+
+![](https://pic.downk.cc/item/5e80c417504f4bcb04826dfb.png)

@@ -1,4 +1,6 @@
 spring:
+  redis:
+    host: localhost
   application:
     name: gateway-server
   cloud:
@@ -28,7 +30,12 @@ spring:
           args:
             name: fallbackcmd
             fallbackUri: forward:/fallback    #指定熔断跳转地址
-
+        # redis限流 ， filter名称必须是RequestRateLimiter
+        - name: RequestRateLimiter
+          args:
+            key-resolver: '#{@remoteAddrKeyResolver}'   # 使用SpEL名称引用Bean，与建立的RateLimiterConfig类中的bean的name相同
+            redis-rate-limiter.replenishRate: 20    # 每秒最大访问次数
+            redis-rate-limiter.burstCapacity: 20    # 令牌桶最大容量
 hystrix:
   command:
     fallbackcmd:

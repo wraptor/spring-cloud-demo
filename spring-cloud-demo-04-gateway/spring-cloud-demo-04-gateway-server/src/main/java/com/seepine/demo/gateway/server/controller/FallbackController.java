@@ -1,6 +1,6 @@
 package com.seepine.demo.gateway.server.controller;
 
-import com.seepine.demo.gateway.server.utils.Response;
+import com.seepine.demo.gateway.server.util.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

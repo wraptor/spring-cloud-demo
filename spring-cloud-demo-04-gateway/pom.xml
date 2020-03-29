@@ -11,6 +11,10 @@
     <packaging>pom</packaging>
     <artifactId>spring-cloud-demo-04-gateway</artifactId>
 
+    <modules>
+        <module>spring-cloud-demo-04-gateway-provider</module>
+        <module>spring-cloud-demo-04-gateway-server</module>
+    </modules>
 
     <dependencies>
         <!-- undertow -->
@@ -19,4 +23,5 @@
             <artifactId>spring-boot-starter-undertow</artifactId>
         </dependency>
     </dependencies>
+
 </project>

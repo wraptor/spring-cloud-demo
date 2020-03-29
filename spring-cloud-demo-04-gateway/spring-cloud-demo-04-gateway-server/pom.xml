@@ -7,7 +7,6 @@
         <groupId>com.seepine</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <groupId>com.seepine</groupId>
     <artifactId>spring-cloud-demo-04-gateway-server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>spring-cloud-demo-04-gateway-server</name>
@@ -27,9 +26,14 @@
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
         </dependency>
+        <!-- hystrix 熔断器 -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis-reactive</artifactId>
         </dependency>
     </dependencies>
 

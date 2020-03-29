@@ -1,4 +1,4 @@
-package com.seepine.demo.gateway.server.utils;
+package com.seepine.demo.gateway.server.util;
 
 import lombok.Data;
 import org.springframework.http.HttpStatus;

@@ -1,10 +1,75 @@
 # spring-cloud-demo-03-nacos
 
-> 本Demo演示了网关的搭建，以及如何使用网关配合Nacos（使用eureka和config同理）访问其他服务，并进行分流、限流和熔断等配置。
+> 本Demo演示了网关的搭建，以及如何使用网关配合Nacos（使用eureka和config同理）访问其他服务，并进行过滤、熔断和限流等配置。
 
 ## 模块介绍
 
-spring-cloud-demo-04-gateway模块只有一个子模块，但其为配合spring-cloud-demo-03-nacos模块中的Provider(供应者)和Consumer(消费者)进行演示。
+spring-cloud-demo-04-gateway包含两个模块，分别是Server(网关服务)和Provider(供应者)进行演示。
+
+## 一、搭建Provider
+### 1.添加依赖
+
+```xml
+<dependencies>
+    <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>com.alibaba.cloud</groupId>
+        <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>com.alibaba.cloud</groupId>
+        <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+    </dependency>
+</dependencies>
+```
+
+### 2.添加配置文件
+```yaml
+spring:
+  application:
+    name: gateway-provider
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+      config:
+        server-addr: ${spring.cloud.nacos.discovery.server-addr}
+        file-extension: yml
+
+server:
+  port: 13000
+```
+### 3.添加接口
+```java
+@RestController
+public class ApiController {
+    @GetMapping("/sleep/{second}")
+    public String sleep(@PathVariable long second) throws InterruptedException {
+        Thread.sleep(second);
+        return "completed";
+    }
+}
+```
+
+### 4.启动Nacos
+已启动的无需再次启动
+```
+#未启动过
+docker run --name nacos -e MODE=standalone -p 8848:8848 -d nacos/nacos-server:latest
+#启动过但停止的
+docker start nacos
+```
+确保Nacos控制台能够访问
+![](https://pic.downk.cc/item/5e7f6124504f4bcb04996682.png)
+
+### 5.启动Spring-cloud-demo-04-gateway-provider并测试接口
+
+![](https://pic.downk.cc/item/5e7f6124504f4bcb04996682.png)
+
+![](https://pic.downk.cc/item/5e7f695e504f4bcb04a1378f.png)
 
 ## 一、搭建网关
 
@@ -28,7 +93,7 @@ spring-cloud-demo-04-gateway模块只有一个子模块，但其为配合spring-
 ```
 
 ### 2.添加配置文件
-
+配置文件中主要包含两部分，第一部分时配置nacos的服务发现及配置中心，第二部分是配置了网关的路由功能，通过网关的服务发现和单独配置路由断言这两种不同的方式来访问其他服务接口。
 ```yaml
 spring:
   application:
@@ -41,34 +106,59 @@ spring:
         server-addr: ${spring.cloud.nacos.discovery.server-addr}
         file-extension: yml
     gateway:
-      discovery:
+      discovery:   #方式一
         locator:
           enabled: true
           lower-case-service-id: true
+      routes:   #方式二
+        - id: gateway-provider  #可随意指定但是要保证唯一
+          uri: lb://gateway-provider  #lib://指定服务名,也可直接指定地址(http://127.0.0.1:12000)
+          predicates:
+            - Path=/provider/**   #当网关匹配到改路径，将会转发到uri地址
+          filters:
+            - StripPrefix=1
 server:
-  port: 13000
+  port: 14000
 ```
+关于"StripPrefix=1"配置，是网关自带的过滤器，去掉N个前缀，具体实现参考StripPrefixGatewayFilterFactory,
+因为provider的接口路径为
+```
+http://localhost:12000/user/config
+```
+而从网关访问接口的路径是
+```
+http://localhost:13000/provider/user/config
+```
+由于我们配置了路由，网关会转发到对应的ip:port，也就是
+```
+http://localhost:12000/provider/user/config
+```
+此时会发现，与我们provider访问的接口路径多了一层/provider,此时若未配置StripPrefix=1将会出现404操作，
+所以有如下三种方式可解决此问题
+1.配置上StripPrefix=1；
+2.在provider加上访问项目名称server.servlet.context-path=/provider；
+3.编写request过滤器，过滤每个链接的第一个路径
+### 3.启动网关
 
-### 3.启动网关（启动nacos服务端的基础上）
+![](https://pic.downk.cc/item/5e7f6a3e504f4bcb04a20b63.png)
 
-![](https://pic.downk.cc/item/5e7f0db7504f4bcb0450d429.png)
+### 4.通过网关访问provider
 
-### 4.启动spring-cloud-demo-03-nacos中的provider并测试
+方式一：其中"nacos-provider"为被访问服务的spring application name，也是向nacos注册的服务名
+[http://127.0.0.1:14000/gateway-provider/sleep/1](http://127.0.0.1:14000/gateway-provider/sleep/1)
+![](https://pic.downk.cc/item/5e7f6a84504f4bcb04a24e42.png)
 
-[http://localhost:12000/user/config](http://localhost:12000/user/config)
-![](https://pic.downk.cc/item/5e7f0fb4504f4bcb0452b581.png)
-![](https://pic.downk.cc/item/5e7f0fbe504f4bcb0452c173.png)
+方式二：也可以使用routes配置的路径来访问
+[http://127.0.0.1:14000/provider/sleep/1](http://127.0.0.1:14000/provider/sleep/1)
+![](https://pic.downk.cc/item/5e7f5935504f4bcb049172de.png)
 
-### 5.通过网关访问provider
-其中"nacos-provider"为被访问服务的spring application name，也是向nacos注册的服务名
-[http://localhost:13000/nacos-provider/user/config](http://localhost:13000/nacos-provider/user/config)
-![](https://pic.downk.cc/item/5e7f0fe1504f4bcb0452e6fe.png)
 
 ## 二、过滤器
+过滤器可以实现通过网关来过滤token、请求头、统一返回格式等功能，通过简单例子来介绍过滤器以及其实现方法。
 
 ### 1.建立response全局过滤器来进行统一返回
 实现GlobalFilter, Ordered
-```java
+```
 @Component
 public class ResponseGlobalFilter implements GlobalFilter, Ordered {
     @Override
@@ -110,60 +200,39 @@ public class ResponseGlobalFilter implements GlobalFilter, Ordered {
 
 ### 2.分别测试正确及错误的接口
 
-[http://localhost:13000/nacos-provider/user/config](http://localhost:13000/nacos-provider/user/config)
+[http://127.0.0.1:14000/provider/sleep/1/](http://127.0.0.1:14000/provider/sleep/1/)
 
-![](https://pic.downk.cc/item/5e7f2274504f4bcb0462a6d4.png)
+![](https://pic.downk.cc/item/5e8099f6504f4bcb0460aeea.png)
 
-[http://localhost:13000/nacos-provider/user/config/123](http://localhost:13000/nacos-provider/user/config/123)
+[http://127.0.0.1:14000/provider/sleep/1/test](http://127.0.0.1:14000/provider/sleep/1/test)
 
 ![](https://pic.downk.cc/item/5e7f228f504f4bcb0462bc98.png)
 
 ## 三、服务熔断
 
-### 1.添加依赖
+服务熔断由hystrix提供，通过在过滤器下配置熔断降级
+### 1.Server添加依赖
 ```xml
 <dependency>
     <groupId>org.springframework.cloud</groupId>
     <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
 </dependency>
 ```
-### 2.使用routes配置服务
+### 2.熔断配置
 
-在配置文件中的gateway节点下增加nacos-provider的routes配置（当然也可以使用Bean的方式配置）
+在配置文件中的gateway节点下增加default-filters过滤器，并增加nacos-provider的routes配置（当然也可以使用Bean的方式配置），使用routes
 ```yaml
 spring:
   cloud:
     gateway:
-      routes:
-        - id: nacos-provider  #可随意指定但是要保证唯一
-          uri: lb://nacos-provider  #lib://指定服务名,也可直接指定地址(http://127.0.0.1:12000)
-          predicates:
-            - Path=/provider/** #当网关匹配到改路径，将会转发到uri地址
-          filters:
-            - StripPrefix=1
-            - name: Hystrix
-              args:
-                name: fallbackcmd
-                fallbackUri: forward:/fallback
+      #配置全局过滤器
+      default-filters:
+        - name: Hystrix
+          args:
+            name: fallbackcmd
+            fallbackUri: forward:/fallback    #指定熔断跳转地址
 ```
-关于"StripPrefix=1"配置，是网关自带的过滤器，去掉N个前缀，具体实现参考StripPrefixGatewayFilterFactory,
-因为provider的接口路径为
-```
-http://localhost:12000/user/config
-```
-而从网关访问接口的路径是
-```
-http://localhost:13000/provider/user/config
-```
-由于我们配置了路由，网关会转发到对应的ip:port，也就是
-```
-http://localhost:12000/provider/user/config
-```
-此时会发现，与我们provider访问的接口路径多了一层/provider,此时若未配置StripPrefix=1将会出现404操作，
-所以有如下三种方式可解决此问题
-1.配置上StripPrefix=1；
-2.在provider加上访问项目名称server.servlet.context-path=/provider；
-3.编写request过滤器，过滤每个链接的第一个路径
+
 
 ### 3.编写熔断接口
 ```java
@@ -178,10 +247,33 @@ public class FallbackController {
 
 ### 4.测试熔断效果
 
-停止provider服务后
+默认超时时间为一秒钟，分别输入不同参数可得结果与结论一致
 
-![](https://pic.downk.cc/item/5e7f2932504f4bcb0467f073.png)
+[http://127.0.0.1:14000/provider/sleep/500](http://127.0.0.1:14000/provider/sleep/500)
 
-启动provider服务后
+![](https://pic.downk.cc/item/5e809d12504f4bcb04639fcd.png)
+[http://127.0.0.1:14000/provider/sleep/1500](http://127.0.0.1:14000/provider/sleep/1500)
 
-![](https://pic.downk.cc/item/5e7f294a504f4bcb04680340.png)
+![](https://pic.downk.cc/item/5e809d1e504f4bcb0463aa51.png)
+
+### 5.修改熔断时间
+```yaml
+hystrix:
+  command:
+    fallbackcmd:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 5000
+```
+
+### 6.再次测试
+
+[http://127.0.0.1:14000/provider/sleep/4500](http://127.0.0.1:14000/provider/sleep/4500)
+
+![](https://pic.downk.cc/item/5e809dea504f4bcb04646b15.png)
+
+[http://127.0.0.1:14000/provider/sleep/5500](http://127.0.0.1:14000/provider/sleep/5500)
+
+![](https://pic.downk.cc/item/5e809e0d504f4bcb04648ddf.png)
+

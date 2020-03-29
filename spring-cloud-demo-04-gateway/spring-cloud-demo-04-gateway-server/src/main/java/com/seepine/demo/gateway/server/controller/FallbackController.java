@@ -1,7 +1,6 @@
-package com.seepine.demo.controller;
+package com.seepine.demo.gateway.server.controller;
 
-import com.seepine.demo.utils.Response;
-import io.undertow.util.StatusCodes;
+import com.seepine.demo.gateway.server.utils.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

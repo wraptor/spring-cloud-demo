@@ -1,7 +1,7 @@
-package com.seepine.demo.filters;
+package com.seepine.demo.gateway.server.filters;
 
 import com.alibaba.fastjson.JSON;
-import com.seepine.demo.utils.Response;
+import com.seepine.demo.gateway.server.utils.Response;
 import org.reactivestreams.Publisher;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;

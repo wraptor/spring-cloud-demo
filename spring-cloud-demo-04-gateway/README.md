@@ -167,7 +167,8 @@ public class ResponseGlobalFilter implements GlobalFilter, Ordered {
         DataBufferFactory bufferFactory = originalResponse.bufferFactory();
         ServerHttpResponseDecorator decoratedResponse = new ServerHttpResponseDecorator(originalResponse) {
             @Override
-            public Mono<Void> writeWith(Publisher<? extends DataBuffer> body) {
+            @SuppressWarnings("unchecked")
+            public Mono<Void> writeWith(@NonNull Publisher<? extends DataBuffer> body) {
                 if (body instanceof Flux) {
                     Flux<? extends DataBuffer> fluxBody = (Flux<? extends DataBuffer>) body;
                     return super.writeWith(fluxBody.map(dataBuffer -> {

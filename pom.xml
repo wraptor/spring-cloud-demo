@@ -80,7 +80,7 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-            <!--spring cloud alibaba web-->
+            <!--spring cloud alibaba-->
             <dependency>
                 <groupId>com.alibaba.cloud</groupId>
                 <artifactId>spring-cloud-alibaba-dependencies</artifactId>
